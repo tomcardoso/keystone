@@ -1,5 +1,7 @@
 import _ from 'lodash';
 import React from 'react';
+import { withGoogleMap, GoogleMap, Marker } from 'react-google-maps';
+import withScriptjs from 'react-google-maps/lib/async/withScriptjs';
 import Field from '../Field';
 import CollapsedFieldLabel from '../../components/CollapsedFieldLabel';
 import NestedFormField from '../../components/NestedFormField';
@@ -11,6 +13,25 @@ import {
 	Grid,
 	LabelledControl,
 } from '../../../admin/client/App/elemental';
+
+const AsyncGoogleMap = _.flowRight(
+  withScriptjs,
+  withGoogleMap,
+)(props => (
+	<GoogleMap
+		ref={props.onMapLoad}
+		defaultZoom={16}
+		defaultCenter={props.defaultCenter}
+		onClick={props.onMapClick}
+		>
+		{props.marker && (
+			<Marker
+				{...props.marker}
+				onRightClick={() => props.onMarkerRightClick(props.marker)}
+				/>
+		)}
+	</GoogleMap>
+));
 
 /**
  * TODO:
@@ -28,15 +49,16 @@ module.exports = Field.create({
 	getInitialState () {
 		return {
 			collapsedFields: {},
-			improve: false,
+			improve: true,
 			overwrite: false,
 		};
 	},
 
 	componentWillMount () {
-		const { value = [] } = this.props;
+		const { map, value = [] } = this.props;
+		const fields = map ? [] : ['number', 'name', 'street2', 'geo'];
 		var collapsedFields = {};
-		_.forEach(['number', 'name', 'street2', 'geo'], (i) => {
+		_.forEach(fields, (i) => {
 			if (!value[i]) {
 				collapsedFields[i] = true;
 			}
@@ -128,13 +150,13 @@ module.exports = Field.create({
 	renderSuburbState () {
 		const { value = {}, path } = this.props;
 		return (
-			<NestedFormField label="Suburb / State" data-field-location-path={path + '.suburb_state'}>
+			<NestedFormField label="City / Province" data-field-location-path={path + '.suburb_state'}>
 				<Grid.Row gutter={10}>
 					<Grid.Col small="two-thirds" data-field-location-path={path + '.suburb'}>
 						<FormInput
 							name={this.getInputName(path + '.suburb')}
 							onChange={this.makeChanger('suburb')}
-							placeholder="Suburb"
+							placeholder="City"
 							value={value.suburb || ''}
 						/>
 					</Grid.Col>
@@ -142,7 +164,7 @@ module.exports = Field.create({
 						<FormInput
 							name={this.getInputName(path + '.state')}
 							onChange={this.makeChanger('state')}
-							placeholder="State"
+							placeholder="Province"
 							value={value.state || ''}
 						/>
 					</Grid.Col>
@@ -154,13 +176,13 @@ module.exports = Field.create({
 	renderPostcodeCountry () {
 		const { value = {}, path } = this.props;
 		return (
-			<NestedFormField label="Postcode / Country" data-field-location-path={path + '.postcode_country'}>
+			<NestedFormField label="Postal code / Country" data-field-location-path={path + '.postcode_country'}>
 				<Grid.Row gutter={10}>
 					<Grid.Col small="one-third" data-field-location-path={path + '.postcode'}>
 						<FormInput
 							name={this.getInputName(path + '.postcode')}
 							onChange={this.makeChanger('postcode')}
-							placeholder="Post Code"
+							placeholder="Postal Code"
 							value={value.postcode || ''}
 						/>
 					</Grid.Col>
@@ -169,11 +191,82 @@ module.exports = Field.create({
 							name={this.getInputName(path + '.country')}
 							onChange={this.makeChanger('country')}
 							placeholder="Country"
-							value={value.country || ''}
+							value={value.country || 'Canada'}
 						/>
 					</Grid.Col>
 				</Grid.Row>
 			</NestedFormField>
+		);
+	},
+
+	handleMapLoad (map) {
+		this.map = map;
+	},
+
+	// Remove marker
+	handleMarkerRightClick () {
+		const { value = {}, path, onChange } = this.props;
+		const geo = ['', ''];
+		onChange({
+			path,
+			value: {
+				...value,
+				geo,
+			},
+		});
+	},
+
+	handleMapClick (event) {
+		const { value = {}, path, onChange } = this.props;
+		const lng = event.latLng.lng();
+		const lat = event.latLng.lat();
+		const geo = [
+			lng || (value.geo ? value.geo[0] : 0.0),
+			lat || (value.geo ? value.geo[1] : 0.0),
+		];
+		onChange({
+			path,
+			value: {
+				...value,
+				geo,
+			},
+		});
+	},
+
+	renderMap () {
+		const { value = {}, map, height, browserApiKey, defaultCenter } = this.props;
+		if (!map) return null;
+		const hasLng = value && value.geo && value.geo[0];
+		const hasLat = value && value.geo && value.geo[1];
+		const marker = hasLng && hasLat ? {
+			position: {
+				lng: value.geo[0],
+				lat: value.geo[1],
+			},
+		} : null;
+
+		const googleMapURL = `https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=geometry,drawing,places&key=${browserApiKey}`;
+
+		return (
+			<FormField offsetAbsentLabel>
+				<AsyncGoogleMap
+					googleMapURL={googleMapURL}
+					defaultCenter={marker ? marker.position : defaultCenter}
+					loadingElement={
+						<div style={{ height }} />
+					}
+					containerElement={
+						<div style={{ height }} />
+					}
+					mapElement={
+						<div style={{ height }} />
+					}
+					marker={marker}
+					onMarkerRightClick={this.handleMarkerRightClick}
+					onMapLoad={this.handleMapLoad}
+					onMapClick={this.handleMapClick}
+					/>
+			</FormField>
 		);
 	},
 
@@ -275,13 +368,14 @@ module.exports = Field.create({
 				<FormField label={label} htmlFor={path}>
 					{showMore}
 				</FormField>
-				{this.renderField('number', 'PO Box / Shop', true, true)}
-				{this.renderField('name', 'Building Name', true)}
+				{/* {this.renderField('number', 'PO Box / Shop', true, true)} */}
+				{/* {this.renderField('name', 'Building Name', true)} */}
 				{this.renderField('street1', 'Street Address')}
 				{this.renderField('street2', 'Street Address 2', true)}
 				{this.renderSuburbState()}
 				{this.renderPostcodeCountry()}
 				{this.renderGeo()}
+				{this.renderMap()}
 				{this.renderGoogleOptions()}
 				{this.renderNote()}
 			</div>
