@@ -49,7 +49,7 @@ module.exports = Field.create({
 	getInitialState () {
 		return {
 			collapsedFields: {},
-			improve: true,
+			improve: false,
 			overwrite: false,
 		};
 	},
@@ -150,9 +150,9 @@ module.exports = Field.create({
 	renderSuburbState () {
 		const { value = {}, path } = this.props;
 		return (
-			<NestedFormField label="City / Province" data-field-location-path={path + '.suburb_state'}>
+			<NestedFormField label="City / Province / Postal" data-field-location-path={path + '.suburb_state_postcode'}>
 				<Grid.Row gutter={10}>
-					<Grid.Col small="two-thirds" data-field-location-path={path + '.suburb'}>
+					<Grid.Col small="one-third" data-field-location-path={path + '.suburb'}>
 						<FormInput
 							name={this.getInputName(path + '.suburb')}
 							onChange={this.makeChanger('suburb')}
@@ -168,16 +168,6 @@ module.exports = Field.create({
 							value={value.state || ''}
 						/>
 					</Grid.Col>
-				</Grid.Row>
-			</NestedFormField>
-		);
-	},
-
-	renderPostcodeCountry () {
-		const { value = {}, path } = this.props;
-		return (
-			<NestedFormField label="Postal code / Country" data-field-location-path={path + '.postcode_country'}>
-				<Grid.Row gutter={10}>
 					<Grid.Col small="one-third" data-field-location-path={path + '.postcode'}>
 						<FormInput
 							name={this.getInputName(path + '.postcode')}
@@ -186,14 +176,32 @@ module.exports = Field.create({
 							value={value.postcode || ''}
 						/>
 					</Grid.Col>
-					<Grid.Col small="two-thirds" data-field-location-path={path + '.country'}>
+				</Grid.Row>
+			</NestedFormField>
+		);
+	},
+
+	renderPostcodeCountry () {
+		const { value = {}, path } = this.props;
+		return (
+			<NestedFormField label="Postal code" data-field-location-path={path + '.postcode_country'}>
+				<Grid.Row gutter={10}>
+					{/* <Grid.Col small="one-whole" data-field-location-path={path + '.postcode'}>
+						<FormInput
+							name={this.getInputName(path + '.postcode')}
+							onChange={this.makeChanger('postcode')}
+							placeholder="Postal Code"
+							value={value.postcode || ''}
+						/>
+					</Grid.Col> */}
+					{/* <Grid.Col small="two-thirds" data-field-location-path={path + '.country'}>
 						<FormInput
 							name={this.getInputName(path + '.country')}
 							onChange={this.makeChanger('country')}
 							placeholder="Country"
-							value={value.country || 'Canada'}
+							value={value.country || ''}
 						/>
-					</Grid.Col>
+					</Grid.Col> */}
 				</Grid.Row>
 			</NestedFormField>
 		);
@@ -373,7 +381,7 @@ module.exports = Field.create({
 				{this.renderField('street1', 'Street Address')}
 				{this.renderField('street2', 'Street Address 2', true)}
 				{this.renderSuburbState()}
-				{this.renderPostcodeCountry()}
+				{/* {this.renderPostcodeCountry()} */}
 				{this.renderGeo()}
 				{this.renderMap()}
 				{this.renderGoogleOptions()}
