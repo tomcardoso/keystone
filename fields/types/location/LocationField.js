@@ -21,7 +21,7 @@ const AsyncGoogleMap = _.flowRight(
 	<GoogleMap
 		ref={props.onMapLoad}
 		defaultZoom={16}
-		defaultCenter={props.defaultCenter}
+		center={props.defaultCenter}
 		onClick={props.onMapClick}
 		>
 		{props.marker && (
@@ -152,7 +152,7 @@ module.exports = Field.create({
 		return (
 			<NestedFormField label="City / Province / Postal" data-field-location-path={path + '.suburb_state_postcode'}>
 				<Grid.Row gutter={10}>
-					<Grid.Col small="one-third" data-field-location-path={path + '.suburb'}>
+					<Grid.Col small="one-quarter" data-field-location-path={path + '.suburb'}>
 						<FormInput
 							name={this.getInputName(path + '.suburb')}
 							onChange={this.makeChanger('suburb')}
@@ -160,7 +160,7 @@ module.exports = Field.create({
 							value={value.suburb || ''}
 						/>
 					</Grid.Col>
-					<Grid.Col small="one-third" data-field-location-path={path + '.state'}>
+					<Grid.Col small="one-quarter" data-field-location-path={path + '.state'}>
 						<FormInput
 							name={this.getInputName(path + '.state')}
 							onChange={this.makeChanger('state')}
@@ -168,12 +168,20 @@ module.exports = Field.create({
 							value={value.state || ''}
 						/>
 					</Grid.Col>
-					<Grid.Col small="one-third" data-field-location-path={path + '.postcode'}>
+					<Grid.Col small="one-quarter" data-field-location-path={path + '.postcode'}>
 						<FormInput
 							name={this.getInputName(path + '.postcode')}
 							onChange={this.makeChanger('postcode')}
 							placeholder="Postal Code"
 							value={value.postcode || ''}
+						/>
+					</Grid.Col>
+					<Grid.Col small="two-quarter" data-field-location-path={path + '.country'}>
+						<FormInput
+							name={this.getInputName(path + '.country')}
+							onChange={this.makeChanger('country')}
+							placeholder="Country"
+							value={value.country || ''}
 						/>
 					</Grid.Col>
 				</Grid.Row>
@@ -259,7 +267,7 @@ module.exports = Field.create({
 			<FormField offsetAbsentLabel>
 				<AsyncGoogleMap
 					googleMapURL={googleMapURL}
-					defaultCenter={marker ? marker.position : defaultCenter}
+					center={marker ? marker.position : defaultCenter}
 					loadingElement={
 						<div style={{ height }} />
 					}
