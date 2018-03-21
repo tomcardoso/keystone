@@ -21,7 +21,7 @@ const AsyncGoogleMap = _.flowRight(
 	<GoogleMap
 		ref={props.onMapLoad}
 		defaultZoom={16}
-		center={props.defaultCenter}
+		defaultCenter={props.defaultCenter}
 		onClick={props.onMapClick}
 		>
 		{props.marker && (
@@ -150,7 +150,7 @@ module.exports = Field.create({
 	renderSuburbState () {
 		const { value = {}, path } = this.props;
 		return (
-			<NestedFormField label="City / Province / Postal" data-field-location-path={path + '.suburb_state_postcode'}>
+			<NestedFormField label="City / Prov. / Postal / Country" data-field-location-path={path + '.suburb_state_postcode'}>
 				<Grid.Row gutter={10}>
 					<Grid.Col small="one-quarter" data-field-location-path={path + '.suburb'}>
 						<FormInput
@@ -176,7 +176,7 @@ module.exports = Field.create({
 							value={value.postcode || ''}
 						/>
 					</Grid.Col>
-					<Grid.Col small="two-quarter" data-field-location-path={path + '.country'}>
+					<Grid.Col small="one-quarter" data-field-location-path={path + '.country'}>
 						<FormInput
 							name={this.getInputName(path + '.country')}
 							onChange={this.makeChanger('country')}
@@ -267,6 +267,7 @@ module.exports = Field.create({
 			<FormField offsetAbsentLabel>
 				<AsyncGoogleMap
 					googleMapURL={googleMapURL}
+					// defaultCenter={defaultCenter}
 					center={marker ? marker.position : defaultCenter}
 					loadingElement={
 						<div style={{ height }} />
