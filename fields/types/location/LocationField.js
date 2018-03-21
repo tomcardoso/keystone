@@ -21,7 +21,7 @@ const AsyncGoogleMap = _.flowRight(
 	<GoogleMap
 		ref={props.onMapLoad}
 		defaultZoom={16}
-		defaultCenter={props.defaultCenter}
+		center={props.center}
 		onClick={props.onMapClick}
 		>
 		{props.marker && (
@@ -267,7 +267,6 @@ module.exports = Field.create({
 			<FormField offsetAbsentLabel>
 				<AsyncGoogleMap
 					googleMapURL={googleMapURL}
-					// defaultCenter={defaultCenter}
 					center={marker ? marker.position : defaultCenter}
 					loadingElement={
 						<div style={{ height }} />
