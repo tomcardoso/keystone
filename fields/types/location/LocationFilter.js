@@ -108,9 +108,9 @@ var TextFilter = React.createClass({
 					<Grid.Col xsmall="two-thirds" style={{ marginBottom: 0 }}>
 						<FormInput
 							name="country"
-							// onChange={this.updateValue}
+							onChange={this.updateValue}
 							placeholder="Country"
-							value="Canada"
+							value={filter.country}
 						/>
 					</Grid.Col>
 				</Grid.Row>
